@@ -6,10 +6,12 @@ return {
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
   },
   config = function()
-    vim.keymap.set("n", "<space>ff", require("telescope.builtin").find_files)
+    vim.keymap.set("n", "<space>ff", function()
+      require("telescope.builtin").find_files({ follow = true })
+    end)
     vim.keymap.set("n", "<space>fn", function() -- edit neovim from anywhere
       require("telescope.builtin").find_files({
-        cwd = vim.fn.stdpath("config")
+        cwd = vim.fn.stdpath("config"), follow = true
       })
     end)
   end
