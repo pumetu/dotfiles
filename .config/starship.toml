@@ -1,0 +1,10 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+[package]
+disabled = true
+
+[python]
+disabled = true
+
+[time]
+disabled = true
