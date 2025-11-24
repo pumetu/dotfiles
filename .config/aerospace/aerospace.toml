@@ -156,5 +156,5 @@ automatically-unhide-macos-hidden-apps = false
 [[on-window-detected]]
 if.app-id="com.mitchellh.ghostty"
 run= [
-  "layout floating",
+  "layout tiling",
 ]
