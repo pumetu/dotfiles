@@ -52,9 +52,9 @@ return {
           }
         }
       })
-      vim.lsp.enable("lua_ls")
-      vim.lsp.enable("pyright")
-      vim.lsp.enable("ruff")
+      vim.lsp.config("pyright", { cmd = { "uvx", "--from", "pyright", "pyright-langserver", "--stdio" } })
+      vim.lsp.config("mojo", { cmd = { "pixi", "run", "mojo-lsp-server" } })
+      vim.lsp.enable({ "lua_ls", "pyright", "ruff", "mojo" })
 
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)
@@ -71,10 +71,32 @@ return {
           end
         end
       })
+      -- Format Mojo files on save using the CLI
+      vim.api.nvim_create_autocmd("BufWritePost", {
+        pattern = "*.mojo",
+        callback = function()
+          -- Format the file on disk
+          vim.fn.jobstart({ "pixi", "run", "mojo", "format", "--line-length", "120", vim.api.nvim_buf_get_name(0) }, {
+            on_exit = function()
+              -- Reload buffer after formatting
+              if vim.api.nvim_buf_is_loaded(0) then
+                vim.cmd("checktime") -- reload if file changed externally
+              end
+            end,
+          })
+        end,
+      })
 
       vim.diagnostic.config({
-        virtual_text = true,
-        virtual_lines = { current_line = true },
+        virtual_text = false,     -- ⛔ no inline text
+        signs = true,             -- ✅ gutter signs
+        underline = true,         -- ✅ underline the problem
+        update_in_insert = false, -- don't distract while typing
+        severity_sort = true,     -- show most severe first
+        float = {
+          border = "rounded",
+          source = "if_many",
+        },
       })
     end,
   }
