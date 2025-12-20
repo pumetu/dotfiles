@@ -120,20 +120,13 @@ require("lazy").setup({
         }
         vim.lsp.enable("lua_ls")
         -- Python
-        vim.lsp.config("pyright", {
+        vim.lsp.config('ty', {
           settings = {
-            pyright = {
-              disableOrganizeImports = true,
-            },
-            python = {
-              analysis = {
-                ignore = { "*" },
-              },
-            },
-          },
-          cmd = { "uvx", "--from", "pyright", "pyright-languageserver", "--stdio" },
+            ty = {
+            }
+          }
         })
-        vim.lsp.enable("pyright")
+        vim.lsp.enable('ty')
 
         vim.lsp.config("ruff", {
           cmd = { "ruff", "server" },
@@ -153,6 +146,9 @@ require("lazy").setup({
           group = vim.api.nvim_create_augroup('my.lsp', {}),
           callback = function(args)
             local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+
+            -- Keymaps
+            vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = args.buf, desc = "Goto Definition" })
 
             -- Auto-format ("lint") on save.
             -- Usually not needed if server supports "textDocument/willSaveWaitUntil".
