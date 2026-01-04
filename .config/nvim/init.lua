@@ -241,6 +241,17 @@ require("lazy").setup({
         require("mini.statusline").setup()
       end
     },
+    -- Fyler
+    {
+      "A7Lavinraj/fyler.nvim",
+      dependencies = { "nvim-mini/mini.icons" },
+      branch = "stable",
+      lazy = false,
+      opts = {},
+      keys = {
+        { "<leader>e", "<Cmd>Fyler<Cr>", desc = "Open Fyler View" },
+      }
+    }
   },
 
   checker = { enabled = true },
