@@ -249,7 +249,7 @@ require("lazy").setup({
       lazy = false,
       opts = {},
       keys = {
-        { "<leader>e", "<Cmd>Fyler<Cr>", desc = "Open Fyler View" },
+        { "<leader>t", "<Cmd>Fyler<Cr>", desc = "Open Fyler View" },
       }
     }
   },
