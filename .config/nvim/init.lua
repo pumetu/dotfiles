@@ -22,7 +22,6 @@ vim.o.virtualedit = 'block' -- In C-v mode, allow moving past EOL.
 vim.o.scrolloff = 3         -- Keep 3 context lines above and below the cursor
 vim.o.foldmethod = 'indent' -- allow us to fold on indents
 vim.o.foldlevel = 99        -- but don't fold anything right away!
-vim.o.autoread = true       -- autoread changed files (mainly for mojo formatting)
 
 -- LSP
 vim.o.winborder = "rounded"
@@ -38,7 +37,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "python", "mojo" },
+  pattern = { "python" },
   callback = function()
     vim.opt_local.shiftwidth = 4
     vim.opt_local.tabstop = 4
@@ -138,9 +137,6 @@ require("lazy").setup({
           }
         })
         vim.lsp.enable("ruff")
-        -- Mojo
-        vim.lsp.config("mojo", { cmd = { "pixi", "run", "mojo-lsp-server" } })
-        vim.lsp.enable("mojo")
         -- Format on save
         vim.api.nvim_create_autocmd('LspAttach', {
           group = vim.api.nvim_create_augroup('my.lsp', {}),
@@ -162,21 +158,6 @@ require("lazy").setup({
                 end,
               })
             end
-          end,
-        })
-        -- Format Mojo files
-        vim.api.nvim_create_autocmd("BufWritePost", {
-          pattern = "*.mojo",
-          callback = function()
-            -- Format the file on disk
-            vim.fn.jobstart({ "pixi", "run", "mojo", "format", "--line-length", "120", vim.api.nvim_buf_get_name(0) }, {
-              on_exit = function()
-                -- Reload buffer after formatting
-                if vim.api.nvim_buf_is_loaded(0) then
-                  vim.cmd("checktime") -- reload if file changed externally
-                end
-              end,
-            })
           end,
         })
         vim.diagnostic.config({
