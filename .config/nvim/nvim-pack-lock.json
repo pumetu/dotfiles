@@ -1,0 +1,48 @@
+{
+  "plugins": {
+    "blink.cmp": {
+      "rev": "0f54bd78892f587db4dcf100a23eaddfc2a9df7d",
+      "src": "https://github.com/saghen/blink.cmp"
+    },
+    "blink.lib": {
+      "rev": "5876dd95deeb70aadbe9f1c0b7117a135061cdac",
+      "src": "https://github.com/saghen/blink.lib"
+    },
+    "catppuccin": {
+      "rev": "05e8787020dcfdb937bf2ff23855ea2415b4e072",
+      "src": "https://github.com/catppuccin/nvim"
+    },
+    "fff.nvim": {
+      "rev": "073698c8e7dad9f6106d23ef588f5ebc7f98b326",
+      "src": "https://github.com/dmtrKovalenko/fff.nvim"
+    },
+    "fyler.nvim": {
+      "rev": "60c75b81f93e5093ecc7a9e6d2aeea35291a5aa0",
+      "src": "https://github.com/FylerOrg/fyler.nvim"
+    },
+    "mini.icons": {
+      "rev": "98faae31e9be1cc054ae63485e58ceb185efcad0",
+      "src": "https://github.com/nvim-mini/mini.icons"
+    },
+    "mini.pairs": {
+      "rev": "b1fd9df3bb4a41c8f45778a3859ee80ef6b367e3",
+      "src": "https://github.com/nvim-mini/mini.pairs"
+    },
+    "mini.pick": {
+      "rev": "04e73ab07222508361095bb6e27621b315e6b9f1",
+      "src": "https://github.com/nvim-mini/mini.pick"
+    },
+    "mini.statusline": {
+      "rev": "127997ebef7ef632161203b960c5ef9d158f4810",
+      "src": "https://github.com/nvim-mini/mini.statusline"
+    },
+    "nvim-lspconfig": {
+      "rev": "e7ca2c95ba316a8b846d3f3546d407908c5c4ccb",
+      "src": "https://github.com/neovim/nvim-lspconfig"
+    },
+    "nvim-treesitter": {
+      "rev": "4916d6592ede8c07973490d9322f187e07dfefac",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter"
+    }
+  }
+}
