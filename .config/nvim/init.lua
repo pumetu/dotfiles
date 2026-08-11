@@ -6,16 +6,25 @@ vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 
 vim.o.clipboard = 'unnamedplus'
-vim.g.clipboard = require('vim.ui.clipboard.osc52').tool
+
+-- Over SSH, OSC 52 pushes yanks to the *local* clipboard (nvim -> browser).
+-- The reverse (browser -> nvim) is the terminal's own paste, so paste handlers
+-- read nvim's register instead of querying the terminal: an OSC 52 read blocks
+-- for 10s because terminals refuse to answer clipboard queries.
+local osc52 = require('vim.ui.clipboard.osc52')
+local function paste_reg()
+  return vim.split(vim.fn.getreg('"'), '\n')
+end
+
 vim.g.clipboard = {
   name = 'OSC 52',
   copy = {
-    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+    ['+'] = osc52.copy('+'),
+    ['*'] = osc52.copy('*'),
   },
   paste = {
-    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+    ['+'] = paste_reg,
+    ['*'] = paste_reg,
   },
 }
 
@@ -97,6 +106,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 ----------------
 -- LSP
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Line diagnostics" })
+vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
 
 -- Editor
 vim.keymap.set("x", "p", [["_dP]], { desc = "Paste over selection without losing yanked text" })
@@ -134,15 +144,25 @@ vim.pack.add({
     "https://github.com/nvim-mini/mini.icons",
     "https://github.com/nvim-mini/mini.pairs",
     "https://github.com/nvim-mini/mini.statusline",
-    "https://github.com/nvim-mini/mini.pick"
+    "https://github.com/nvim-mini/mini.pick",
+    "https://github.com/nvim-mini/mini.indentscope"
 })
 -- Colorscheme
 vim.cmd.colorscheme "catppuccin-nvim"
 
 -- Mini
+-- mini.pick and fyler both probe for `_G.MiniIcons`, which only setup() defines.
+-- Without it every picker redraw runs a failing require('nvim-web-devicons') per
+-- visible item, and failed requires rescan package.path -- ~15ms a keystroke here.
+require("mini.icons").setup({})
 require("mini.statusline").setup({})
 require("mini.pairs").setup({})
-require("mini.pick").setup({
+require("mini.indentscope").setup({})
+local pick = require("mini.pick")
+pick.setup({
+    -- Resolving an icon also stats every visible item. Over NFS that is another
+    -- ~30ms per keystroke, so show the pickers without icons.
+    source = { show = pick.default_show },
     mappings = {
         move_down = '<C-j>',
         move_up   = '<C-k>',
@@ -155,6 +175,9 @@ local fyler = require('fyler')
 fyler.setup({
     integrations = {
         icon = "mini_icons",
+    },
+    ui = {
+        hidden_items = { switches = {} }
     }
 })
 vim.keymap.set("n", "<leader>t", "<cmd>Fyler<cr>", { desc = "File explorer" })
@@ -196,6 +219,10 @@ vim.api.nvim_create_autocmd("FileType", {
     callback = function(args)
         if vim.list_contains(config.get_installed(), vim.treesitter.language.get_lang(args.match)) then
             vim.treesitter.start(args.buf)
+            -- Treesitter highlights but never loads the syntax engine, so synID() comes back
+            -- empty. Legacy indentexprs use it to skip brackets inside strings/comments --
+            -- without it, a stray `{` in a comment reindents the rest of the file.
+            vim.bo[args.buf].syntax = args.match
         end
     end,
 })
