@@ -143,9 +143,12 @@ vim.pack.add({
     "https://github.com/FylerOrg/fyler.nvim",
     "https://github.com/nvim-mini/mini.icons",
     "https://github.com/nvim-mini/mini.pairs",
+    "https://github.com/nvim-mini/mini.surround",
     "https://github.com/nvim-mini/mini.statusline",
     "https://github.com/nvim-mini/mini.pick",
-    "https://github.com/nvim-mini/mini.indentscope"
+    "https://github.com/nvim-mini/mini.indentscope",
+    "https://github.com/MeanderingProgrammer/render-markdown.nvim",
+    "https://github.com/m00qek/baleia.nvim"
 })
 -- Colorscheme
 vim.cmd.colorscheme "catppuccin-nvim"
@@ -157,6 +160,7 @@ vim.cmd.colorscheme "catppuccin-nvim"
 require("mini.icons").setup({})
 require("mini.statusline").setup({})
 require("mini.pairs").setup({})
+require("mini.surround").setup({})
 require("mini.indentscope").setup({})
 local pick = require("mini.pick")
 pick.setup({
@@ -187,6 +191,22 @@ local cmp = require('blink.cmp')
 cmp.build():pwait()
 cmp.setup()
 
+-- Baleia
+-- prime-rl forces loguru to colorize even when stdout is a plain file, so the run
+-- logs carry literal ANSI escapes. Paint them instead of showing the raw codes.
+-- Colorizing rewrites the lines with the escapes stripped, which dirties the
+-- buffer -- clear the flag so a stray :w can't rewrite a log a run is appending to.
+-- The default async pass rewrites the lines after the autocmd returns, so the flag
+-- would be cleared too early; sync is ~50ms on a 6k-line orchestrator.log.
+local baleia = require("baleia").setup({ async = false })
+vim.api.nvim_create_autocmd("BufReadPost", {
+    pattern = "*.log",
+    callback = function(ev)
+        baleia.once(ev.buf)
+        vim.bo[ev.buf].modified = false
+    end,
+})
+
 -- TreeSitter
 local treesitter = require("nvim-treesitter")
 treesitter.setup({})
@@ -194,8 +214,10 @@ local ensure_installed = {
     "json",
     "lua",
     "markdown",
+    "markdown_inline",
     "python",
     "bash",
+    "toml",
 }
 
 local config = require("nvim-treesitter.config")
@@ -226,6 +248,15 @@ vim.api.nvim_create_autocmd("FileType", {
         end
     end,
 })
+----------------
+-- Markdown
+----------------
+require("render-markdown").setup({
+    completions = { lsp = { enabled = true } },
+})
+vim.keymap.set("n", "<leader>m", "<cmd>RenderMarkdown toggle<cr>",
+    { desc = "Toggle markdown rendering" })
+
 -- Python
 vim.lsp.config('ty', {
   settings = {
@@ -245,3 +276,6 @@ vim.lsp.config('ruff', {
 })
 
 vim.lsp.enable('ruff')
+
+-- TOML
+vim.lsp.enable('tombi')
