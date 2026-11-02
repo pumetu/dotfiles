@@ -135,7 +135,7 @@ end, { desc = "Toggle Builtin Undotree" })
 -- Plugins
 ----------------
 vim.pack.add({ 
-    { src = "https://github.com/catppuccin/nvim", name = "catppuccin" },
+    "https://github.com/projekt0n/github-nvim-theme",
     "https://github.com/saghen/blink.lib",
     "https://github.com/saghen/blink.cmp",
     "https://github.com/neovim/nvim-lspconfig",
@@ -151,7 +151,7 @@ vim.pack.add({
     "https://github.com/m00qek/baleia.nvim"
 })
 -- Colorscheme
-vim.cmd.colorscheme "catppuccin-nvim"
+vim.cmd.colorscheme "github_dark_default"
 
 -- Mini
 -- mini.pick and fyler both probe for `_G.MiniIcons`, which only setup() defines.
@@ -259,6 +259,9 @@ vim.keymap.set("n", "<leader>m", "<cmd>RenderMarkdown toggle<cr>",
 
 -- Python
 vim.lsp.config('ty', {
+  -- Root at the nearest project file (lspconfig's default list, pinned here), so a nested uv project such as
+  -- tinyswarm/examples/factorio gets its own ty server, which uses that project's [tool.ty.environment].
+  root_markers = { 'ty.toml', 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', '.git' },
   settings = {
     ty = {
     }
